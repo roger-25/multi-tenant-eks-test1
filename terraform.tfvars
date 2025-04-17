@@ -1,0 +1,11 @@
+# Generic Variables
+vpc_name                    = "eks-test"
+vpc_cidr_block              = "10.0.0.0/16"
+vpc_public_subnets          = ["10.0.0.0/20","10.0.16.0/20"]
+vpc_private_subnets         = ["10.0.128.0/20","10.0.144.0/20"]
+cluster_name                = "teraform-eks-test"
+aws_region                  = "us-east-1"
+image_url                   = "746669234841.dkr.ecr.us-east-1.amazonaws.com/testing/roger"
+acm_certificate_arn         = "arn:aws:acm:us-east-1:746669234841:certificate/5d581e20-e6b5-4e27-8051-89a73417ff27"
+domain_name                 = "rogeralex.work.gd"
+alb_public_subnet_ids       = ["subnet-011a1ff37fd62c07b","subnet-0c81521416a5591a4"]
