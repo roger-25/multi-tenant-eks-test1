@@ -1,0 +1,68 @@
+
+name: Multi-Tenant EKS Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant_name:
+        required: true
+      tenant_env:
+        required: true
+      region:
+        required: true
+        default: "us-east-1"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ github.event.inputs.region }}
+      TENANT_NAME: ${{ github.event.inputs.tenant_name }}
+      TENANT_ENV: ${{ github.event.inputs.tenant_env }}
+      IMAGE_NAME: ${{ github.event.inputs.tenant_name }}-nginx
+      TF_VAR_tenant_name: ${{ github.event.inputs.tenant_name }}
+      TF_VAR_tenant_env: ${{ github.event.inputs.tenant_env }}
+      TF_VAR_region: ${{ github.event.inputs.region }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $IMAGE_NAME ./docker
+          docker tag $IMAGE_NAME:latest ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
+
+      - name: Set image URL for Terraform
+        run: |
+          echo "TF_VAR_image_url=${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest" >> $GITHUB_ENV
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./multi-tenant-eks
+
+      - name: Select/Create Workspace
+        run: |
+          terraform workspace select $TENANT_NAME || terraform workspace new $TENANT_NAME
+        working-directory: ./multi-tenant-eks
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./multi-tenant-eks
