@@ -1,4 +1,3 @@
-
 name: Multi-Tenant EKS Deployment
 
 on:
@@ -25,44 +24,53 @@ jobs:
       TF_VAR_region: ${{ github.event.inputs.region }}
 
     steps:
+      # Checkout code
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # Configure AWS credentials dynamically based on input region
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.region }}
 
+      # Log in to Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      # Build and push Docker image
       - name: Build and push Docker image
         run: |
-          docker build -t $IMAGE_NAME .
+          docker build -t $IMAGE_NAME ./docker   # Ensure correct build context (./docker is just an example)
           docker tag $IMAGE_NAME:latest ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
           docker push ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
 
+      # Set image URL for Terraform to use
       - name: Set image URL for Terraform
         run: |
           echo "TF_VAR_image_url=${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest" >> $GITHUB_ENV
 
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.3
 
+      # Terraform Init
       - name: Terraform Init
         run: terraform init
         working-directory: ./multi-tenant-eks
 
+      # Select/Create Workspace for Tenant
       - name: Select/Create Workspace
         run: |
           terraform workspace select $TENANT_NAME || terraform workspace new $TENANT_NAME
         working-directory: ./multi-tenant-eks
 
+      # Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -timeout=20m  # Adding a timeout for long running Terraform apply
         working-directory: ./multi-tenant-eks
