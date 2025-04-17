@@ -41,12 +41,23 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      # Build and push Docker image
-      - name: Build and push Docker image
+      - name: Docker build and push
         run: |
-          docker build -t ${{ secrets.AWS_ECR_REGISTRY }}/testing/roger:${{ github.event.client_payload.tenant_name }} .
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
-          docker push ${{ secrets.AWS_ECR_REGISTRY }}/roger:${{ github.event.client_payload.tenant_name }}
+          echo "Tenant name: ${{ github.event.client_payload.tenant_name }}"
+          
+          IMAGE_TAG=${{ github.event.client_payload.tenant_name }}
+          ECR_REGISTRY=${{ secrets.AWS_ECR_REGISTRY }}
+          IMAGE_URI=$ECR_REGISTRY/testing/roger:$IMAGE_TAG
+      
+          echo "Building Docker image with tag: $IMAGE_URI"
+          
+          docker build -t $IMAGE_URI .
+      
+          echo "Logging into ECR"
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+      
+          echo "Pushing image to ECR"
+          docker push $IMAGE_URI
 
       # Set image URL for Terraform to use
       - name: Set image URL for Terraform
