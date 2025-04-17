@@ -44,7 +44,7 @@ jobs:
       # Build and push Docker image
       - name: Build and push Docker image
         run: |
-          docker build -t $IMAGE_NAME ./docker   # Ensure correct build context (./docker is just an example)
+          docker build -t $IMAGE_NAME .   # Ensure correct build context (./docker is just an example)
           docker tag $IMAGE_NAME:latest ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
           docker push ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
 
