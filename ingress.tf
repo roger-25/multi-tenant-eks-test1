@@ -7,7 +7,6 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
   metadata {
     name      = "${var.tenant_name}-ingress"
     namespace = kubernetes_namespace.user_namespace.metadata[0].name
-    
   }
    
     annotations = {
