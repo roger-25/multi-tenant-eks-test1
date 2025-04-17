@@ -44,9 +44,9 @@ jobs:
       # Build and push Docker image
       - name: Build and push Docker image
         run: |
-          docker build -t $IMAGE_NAME .   # Ensure correct build context (./docker is just an example)
-          docker tag $IMAGE_NAME:latest ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest
+          docker build -t ${{ secrets.AWS_ECR_REGISTRY }}/roger:${{ github.event.client_payload.tenant_name }} .  
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
+          docker push ${{ secrets.AWS_ECR_REGISTRY }}/roger:${{ github.event.client_payload.tenant_name }}
 
       # Set image URL for Terraform to use
       - name: Set image URL for Terraform
