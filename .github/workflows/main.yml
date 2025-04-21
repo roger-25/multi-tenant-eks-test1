@@ -18,7 +18,7 @@ jobs:
       AWS_REGION: ${{ github.event.inputs.region }}
       TENANT_NAME: ${{ github.event.inputs.tenant_name }}
       TENANT_ENV: ${{ github.event.inputs.tenant_env }}
-      IMAGE_NAME: ${{ github.event.inputs.tenant_name }}-nginx
+      IMAGE_NAME: ${{ github.event.inputs.tenant_name }}
       TF_VAR_tenant_name: ${{ github.event.inputs.tenant_name }}
       TF_VAR_tenant_env: ${{ github.event.inputs.tenant_env }}
       TF_VAR_region: ${{ github.event.inputs.region }}
@@ -44,7 +44,7 @@ jobs:
       - name: Docker build and push
         run: |         
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 746669234841.dkr.ecr.us-east-1.amazonaws.com
-          IMAGE_TAG="${GITHUB_EVENT_CLIENT_PAYLOAD_TENANT_NAME:-latest}"
+          IMAGE_TAG=$TENANT_NAME
           docker build -t "746669234841.dkr.ecr.us-east-1.amazonaws.com/roger-repo:$IMAGE_TAG" .
           docker push "746669234841.dkr.ecr.us-east-1.amazonaws.com/roger-repo:$IMAGE_TAG"
 
@@ -60,9 +60,18 @@ jobs:
           terraform_version: 1.6.3
 
       # Terraform Init
+      #- name: Terraform Init
+        #run: terraform init
+      # working-directory: ./
+      
       - name: Terraform Init
-        run: terraform init
-        working-directory: ./
+        run: |
+          terraform init \
+            -backend-config="bucket=multi-tenant-users" \
+            -backend-config="region=us-east-1" \
+            -backend-config="key=tenant-state/${{ github.event.client_payload.tenant_name }}/terraform.tfstate" \
+            -backend-config="dynamodb_table=multi-tenant-db"
+        working-directory: ./multi-tenant-eks
 
       # Select/Create Workspace for Tenant
       - name: Select/Create Workspace
@@ -72,5 +81,5 @@ jobs:
 
       # Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve -timeout=20m  # Adding a timeout for long running Terraform apply
+        run: terraform apply -auto-approve 
         working-directory: ./multi-tenant-eks
