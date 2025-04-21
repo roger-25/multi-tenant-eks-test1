@@ -9,5 +9,5 @@ image_url                   = "746669234841.dkr.ecr.us-east-1.amazonaws.com/roge
 acm_certificate_arn         = "arn:aws:acm:us-east-1:746669234841:certificate/5d581e20-e6b5-4e27-8051-89a73417ff27"
 domain_name                 = "rogeralex.work.gd"
 alb_public_subnet_ids       = ["subnet-011a1ff37fd62c07b","subnet-0c81521416a5591a4"]
-alb_dns_name                = "eks-alb-test-1844608350.us-east-1.elb.amazonaws.com"
+alb_dns_name                = "alb-1278287419.us-east-1.elb.amazonaws.com"
 alb_zone_id                 = "Z35SXDOTRQ7X7K"
