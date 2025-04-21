@@ -1,8 +1,3 @@
-data "aws_acm_certificate" "issued" {
-  domain   = "*.rogeralex.work.gd"
-  statuses = ["ISSUED"]
-}
-
 resource "kubernetes_ingress_v1" "myapp1_ingress" {
   metadata {
     name      = "${var.tenant_name}-ingress"
@@ -11,25 +6,21 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
       # ALB Core Settings
       "alb.ingress.kubernetes.io/scheme"           = "internet-facing"
       "alb.ingress.kubernetes.io/target-type"      = "ip"
-      "alb.ingress.kubernetes.io/healthcheck-path" = "/"  # Updated to match app
+      "alb.ingress.kubernetes.io/healthcheck-path" = "/"
+      "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = "30"
+      "alb.ingress.kubernetes.io/healthcheck-timeout-seconds"  = "5"
+      "alb.ingress.kubernetes.io/success-codes"               = "200"
 
       # HTTPS Configuration
       "alb.ingress.kubernetes.io/certificate-arn"  = data.aws_acm_certificate.issued.arn
       "alb.ingress.kubernetes.io/ssl-policy"       = "ELBSecurityPolicy-TLS13-1-2-2021-06"
       "alb.ingress.kubernetes.io/listen-ports"     = jsonencode([
         { "HTTPS" = 443 },
-        { "HTTP" = 80 }
+        { "HTTP"  = 80 }
       ])
 
-      # Redirect HTTP → HTTPS
-      "alb.ingress.kubernetes.io/actions.ssl-redirect" = jsonencode({
-        Type = "redirect"
-        RedirectConfig = {
-          Protocol   = "HTTPS"
-          Port       = "443"
-          StatusCode = "HTTP_301"
-        }
-      })
+      # Redirect HTTP → HTTPS (simplified)
+      "alb.ingress.kubernetes.io/ssl-redirect"     = "443"
 
       # Security Headers
       "alb.ingress.kubernetes.io/response-headers" = jsonencode({
@@ -41,23 +32,12 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
       "external-dns.alpha.kubernetes.io/hostname" = "rogeralex.work.gd"
     }
   }
+
   spec {
     ingress_class_name = "alb"
     rule {
-      host = "rogeralex.work.gd"
+      host = "*.rogeralex.work.gd"
       http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = "ssl-redirect"
-              port {
-                name = "use-annotation"
-              }
-            }
-          }
-        }
         path {
           path      = "/"
           path_type = "Prefix"
