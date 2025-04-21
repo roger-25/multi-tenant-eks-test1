@@ -7,7 +7,7 @@ resource "kubernetes_deployment_v1" "myapp1" {
     }
   }
 
-  spec 
+  spec {
     replicas = 1
 
     selector {
@@ -27,6 +27,7 @@ resource "kubernetes_deployment_v1" "myapp1" {
         container {
           image = var.image_url
           name  = "app-container"
+
           port {
             container_port = 80
           }
@@ -42,4 +43,4 @@ resource "kubernetes_deployment_v1" "myapp1" {
       }
     }
   }
-
+}
