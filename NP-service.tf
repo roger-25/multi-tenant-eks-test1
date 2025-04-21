@@ -1,6 +1,6 @@
 resource "kubernetes_service_v1" "myapp1_service" {
   metadata {
-    name      = "${var.username}-service"
+    name = "${var.tenant_name}-service"
     namespace = kubernetes_namespace.user_namespace.metadata[0].name
   }
 
