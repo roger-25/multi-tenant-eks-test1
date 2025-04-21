@@ -7,7 +7,7 @@ resource "kubernetes_deployment_v1" "myapp1" {
     }
   }
 
-  spec {
+  spec 
     replicas = 1
 
     selector {
@@ -42,4 +42,4 @@ resource "kubernetes_deployment_v1" "myapp1" {
       }
     }
   }
-}
+
