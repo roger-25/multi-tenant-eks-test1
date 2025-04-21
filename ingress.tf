@@ -7,12 +7,11 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
   metadata {
     name      = "${var.tenant_name}-ingress"
     namespace = kubernetes_namespace.user_namespace.metadata[0].name
-
     annotations = {
       # ALB Core Settings
       "alb.ingress.kubernetes.io/scheme"           = "internet-facing"
       "alb.ingress.kubernetes.io/target-type"      = "ip"
-      "alb.ingress.kubernetes.io/healthcheck-path" = "/healthz"
+      "alb.ingress.kubernetes.io/healthcheck-path" = "/"  # Updated to match app
 
       # HTTPS Configuration
       "alb.ingress.kubernetes.io/certificate-arn"  = data.aws_acm_certificate.issued.arn
@@ -42,19 +41,14 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
       "external-dns.alpha.kubernetes.io/hostname" = "rogeralex.work.gd"
     }
   }
-
   spec {
     ingress_class_name = "alb"
-
     rule {
       host = "rogeralex.work.gd"
-
       http {
-        # Redirect path
         path {
-          path      = "/*"
+          path      = "/"
           path_type = "Prefix"
-
           backend {
             service {
               name = "ssl-redirect"
@@ -64,12 +58,9 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
             }
           }
         }
-
-        # Main app path
         path {
-          path      = "/*"
+          path      = "/"
           path_type = "Prefix"
-
           backend {
             service {
               name = kubernetes_service_v1.myapp1_service.metadata[0].name
