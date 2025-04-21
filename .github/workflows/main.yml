@@ -71,15 +71,14 @@ jobs:
             -backend-config="region=us-east-1" \
             -backend-config="key=tenant-state/${{ github.event.client_payload.tenant_name }}/terraform.tfstate" \
             -backend-config="dynamodb_table=multi-tenant-db"
-        working-directory: ./multi-tenant-eks
+        working-directory: ./
 
       # Select/Create Workspace for Tenant
       - name: Select/Create Workspace
         run: |
           terraform workspace select $TENANT_NAME || terraform workspace new $TENANT_NAME
-        working-directory: ./multi-tenant-eks
-
+        working-directory: ./
       # Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve 
-        working-directory: ./multi-tenant-eks
+        working-directory: ./
