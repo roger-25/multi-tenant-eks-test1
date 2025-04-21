@@ -45,8 +45,8 @@ jobs:
         run: |         
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 746669234841.dkr.ecr.us-east-1.amazonaws.com
           IMAGE_TAG="${GITHUB_EVENT_CLIENT_PAYLOAD_TENANT_NAME:-latest}"
-          docker build -t "746669234841.dkr.ecr.us-east-1.amazonaws.com/testing/roger:$IMAGE_TAG" .
-          docker push "746669234841.dkr.ecr.us-east-1.amazonaws.com/testing/roger:$IMAGE_TAG"
+          docker build -t "746669234841.dkr.ecr.us-east-1.amazonaws.com/roger-repo:$IMAGE_TAG" .
+          docker push "746669234841.dkr.ecr.us-east-1.amazonaws.com/roger-repo:$IMAGE_TAG"
 
       # Set image URL for Terraform to use
       - name: Set image URL for Terraform
