@@ -11,3 +11,4 @@ domain_name                 = "rogeralex.work.gd"
 alb_public_subnet_ids       = ["subnet-011a1ff37fd62c07b","subnet-0c81521416a5591a4"]
 alb_dns_name                = "alb-1278287419.us-east-1.elb.amazonaws.com"
 alb_zone_id                 = "Z35SXDOTRQ7X7K"
+aws_acm_certificate         = "43e6fef7-bff9-4016-a455-6136e78cdccc"
