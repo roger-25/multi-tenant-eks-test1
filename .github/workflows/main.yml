@@ -66,11 +66,12 @@ jobs:
       
       - name: Terraform Init
         run: |
-          terraform init \
-            -backend-config="bucket=multi-tenant-users" \
-            -backend-config="region=us-east-1" \
-            -backend-config="key=tenant-state/${{ github.event.inputs.tenant_name }}/terraform.tfstate" \
-            -backend-config="dynamodb_table=multi-tenant-db"
+          terraform init -reconfigure \
+          -backend-config="bucket=multi-tenant-users" \
+          -backend-config="region=us-east-1" \
+          -backend-config="key=tenant-state/${TENANT_NAME}/terraform.tfstate" \
+          -backend-config="dynamodb_table=multi-tenant-db"
+
         working-directory: ./
 
       # Select/Create Workspace for Tenant
