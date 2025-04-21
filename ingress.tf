@@ -72,7 +72,7 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
 
           backend {
             service {
-              name = kubernetes_service_v1.app_service.metadata[0].name
+              name = kubernetes_service_v1.myapp1_service.metadata[0].name
               port {
                 number = 80
               }

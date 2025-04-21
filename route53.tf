@@ -9,3 +9,8 @@ resource "aws_route53_record" "tenant_dns" {
     evaluate_target_health = true
   }
 }
+
+data "aws_route53_zone" "primary" {
+  name         = var.domain_name
+  private_zone = false
+}
