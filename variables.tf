@@ -25,8 +25,4 @@ variable "acm_certificate_arn" {}
 
 variable "alb_public_subnet_ids" {}
 
-variable "alb_dns_name" {}
-
-variable "alb_zone_id" {}
-
 variable "aws_acm_certificate"{}
