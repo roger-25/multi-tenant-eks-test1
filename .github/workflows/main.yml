@@ -76,5 +76,5 @@ jobs:
 
       #  Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -var-file="${{ inputs.tenant_name }}.tfvars" -auto-approve
         working-directory: ./
