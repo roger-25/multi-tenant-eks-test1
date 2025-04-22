@@ -1,4 +1,3 @@
-
 variable "tenant_name" {}
 
 variable "aws_region" {}
@@ -30,3 +29,5 @@ variable "aws_acm_certificate"{}
 variable "security_group" {}
 
 variable "route53_zone_id" {}
+
+variable "private_subnet_ids"{}

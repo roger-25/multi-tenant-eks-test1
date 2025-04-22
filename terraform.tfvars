@@ -12,3 +12,4 @@ alb_public_subnet_ids       = ["subnet-052d662bfe39cacd4","subnet-0c81521416a559
 aws_acm_certificate         = "43e6fef7-bff9-4016-a455-6136e78cdccc"
 route53_zone_id             = "Z08192452QHP1YWWZQNLR"
 security_group              = "sg-080c9b2b8ffe0964e"
+private_subnet_ids          = ["subnet-01edddf64c55b3a40","subnet-0b5c2790ad850ebfa"]
