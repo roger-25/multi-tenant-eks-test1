@@ -14,6 +14,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     env:
       AWS_REGION: ${{ github.event.inputs.region }}
       TENANT_NAME: ${{ github.event.inputs.tenant_name }}
@@ -28,7 +29,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # Configure AWS credentials dynamically based on input region
+      # Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -41,45 +42,39 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Docker build and push
-        run: |         
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 746669234841.dkr.ecr.us-east-1.amazonaws.com
-          IMAGE_TAG=$TENANT_NAME
-          docker build -t "746669234841.dkr.ecr.us-east-1.amazonaws.com/roger-repo:$IMAGE_TAG" .
-          docker push "746669234841.dkr.ecr.us-east-1.amazonaws.com/roger-repo:$IMAGE_TAG"
-
-      # Set image URL for Terraform to use
-      - name: Set image URL for Terraform
+      #  Docker build and push
+      - name: Build and Push Docker Image
         run: |
-          echo "TF_VAR_image_url=${{ steps.login-ecr.outputs.registry }}/${IMAGE_NAME}:latest" >> $GITHUB_ENV
+          IMAGE_TAG=$TENANT_NAME
+          IMAGE_URI=746669234841.dkr.ecr.${AWS_REGION}.amazonaws.com/roger-repo:$IMAGE_TAG
+          echo "TF_VAR_image_url=$IMAGE_URI" >> $GITHUB_ENV
+          
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
 
-      # Setup Terraform
+      #  Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.3
 
       # Terraform Init
-      #- name: Terraform Init
-        #run: terraform init
-      # working-directory: ./
-      
       - name: Terraform Init
         run: |
           terraform init -reconfigure \
-          -backend-config="bucket=multi-tenant-users" \
-          -backend-config="region=us-east-1" \
-          -backend-config="key=tenant-state/${TENANT_NAME}/terraform.tfstate" \
-          -backend-config="dynamodb_table=multi-tenant-db"
-
+            -backend-config="bucket=multi-tenant-users" \
+            -backend-config="region=${AWS_REGION}" \
+            -backend-config="key=tenant-state/${TENANT_NAME}/terraform.tfstate" \
+            -backend-config="dynamodb_table=multi-tenant-db"
         working-directory: ./
 
-      # Select/Create Workspace for Tenant
+      #  Workspace handling
       - name: Select/Create Workspace
         run: |
           terraform workspace select $TENANT_NAME || terraform workspace new $TENANT_NAME
         working-directory: ./
-      # Terraform Apply
+
+      #  Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve 
+        run: terraform apply -auto-approve
         working-directory: ./

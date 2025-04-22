@@ -13,7 +13,6 @@ variable "region" {}
 
 variable "vpc_cidr_block" {}
 
-
 variable "vpc_public_subnets" {}
 
 variable "vpc_private_subnets" {}

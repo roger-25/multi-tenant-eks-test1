@@ -31,14 +31,6 @@ resource "kubernetes_deployment_v1" "myapp1" {
           port {
             container_port = 80
           }
-
-          # Optional: Add health checks
-          liveness_probe {
-            http_get {
-              path = "/"
-              port = 80
-            }
-          }
         }
       }
     }

@@ -2,8 +2,12 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
   metadata {
     name      = "${var.tenant_name}-ingress"
     namespace = kubernetes_namespace.user_namespace.metadata[0].name
+
     annotations = {
-      # ALB Core Settings
+      # Ingress Class (modern way)
+      "kubernetes.io/ingress.class"                = "alb"
+
+      # ALB Settings
       "alb.ingress.kubernetes.io/scheme"           = "internet-facing"
       "alb.ingress.kubernetes.io/target-type"      = "ip"
       "alb.ingress.kubernetes.io/healthcheck-path" = "/"
@@ -11,32 +15,31 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
       "alb.ingress.kubernetes.io/healthcheck-timeout-seconds"  = "5"
       "alb.ingress.kubernetes.io/success-codes"               = "200"
 
-      # HTTPS Configuration
+      # SSL and HTTP to HTTPS
       "alb.ingress.kubernetes.io/certificate-arn"  = data.aws_acm_certificate.issued.arn
       "alb.ingress.kubernetes.io/ssl-policy"       = "ELBSecurityPolicy-TLS13-1-2-2021-06"
       "alb.ingress.kubernetes.io/listen-ports"     = jsonencode([
         { "HTTPS" = 443 },
         { "HTTP"  = 80 }
       ])
-
-      # Redirect HTTP → HTTPS (simplified)
       "alb.ingress.kubernetes.io/ssl-redirect"     = "443"
 
-      # Security Headers
+      # Optional Headers
       "alb.ingress.kubernetes.io/response-headers" = jsonencode({
         "Strict-Transport-Security" = "max-age=63072000; includeSubdomains; preload"
         "X-Content-Type-Options"    = "nosniff"
       })
 
-      # Route53 Integration
-      "external-dns.alpha.kubernetes.io/hostname" = "rogeralex.work.gd"
+      # External DNS Integration
+      "external-dns.alpha.kubernetes.io/hostname" = "${var.tenant_name}.rogeralex.work.gd"
     }
   }
 
   spec {
-    ingress_class_name = "alb"
+    ingress_class_name = "alb" # Required for newer Kubernetes versions
+
     rule {
-      host = "*.rogeralex.work.gd"
+      host = "${var.tenant_name}.rogeralex.work.gd"
       http {
         path {
           path      = "/"
