@@ -1,6 +1,7 @@
 data "aws_acm_certificate" "issued" {
   domain   = "*.rogeralex.work.gd"
   statuses = ["ISSUED"]
+  most_recent = true
 
   lifecycle {
     postcondition {
