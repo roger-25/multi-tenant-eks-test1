@@ -10,3 +10,5 @@ acm_certificate_arn         = "arn:aws:acm:us-east-1:746669234841:certificate/5d
 domain_name                 = "rogeralex.work.gd"
 alb_public_subnet_ids       = ["subnet-011a1ff37fd62c07b","subnet-0c81521416a5591a4"]
 aws_acm_certificate         = "43e6fef7-bff9-4016-a455-6136e78cdccc"
+route53_zone_id             = "Z08192452QHP1YWWZQNLR"
+security_group              = "sg-080c9b2b8ffe0964e"

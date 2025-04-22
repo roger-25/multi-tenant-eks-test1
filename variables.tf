@@ -26,3 +26,7 @@ variable "acm_certificate_arn" {}
 variable "alb_public_subnet_ids" {}
 
 variable "aws_acm_certificate"{}
+
+variable "security_group" {}
+
+variable "route53_zone_id" {}
