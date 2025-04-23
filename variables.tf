@@ -12,9 +12,9 @@ variable "region" {}
 
 variable "vpc_cidr_block" {}
 
-variable "vpc_public_subnets" {}
+variable "public_subnets" {}
 
-variable "vpc_private_subnets" {}
+variable "public_subnet_ids" {}
 
 variable "image_url" {}
 
@@ -22,12 +22,8 @@ variable "domain_name" {}
 
 variable "acm_certificate_arn" {}
 
-variable "alb_public_subnet_ids" {}
-
 variable "aws_acm_certificate"{}
 
-variable "security_group" {}
+variable "security_group_id" {}
 
 variable "route53_zone_id" {}
-
-variable "private_subnet_ids"{}
