@@ -7,7 +7,7 @@ resource "kubernetes_ingress_v1" "myapp1_ingress" {
       "kubernetes.io/ingress.class"                          = "alb"
       "alb.ingress.kubernetes.io/scheme"                     = "internet-facing"
       "alb.ingress.kubernetes.io/target-type"                = "ip"
-      "alb.ingress.kubernetes.io/healthcheck-path"           = "/health-check"
+      "alb.ingress.kubernetes.io/healthcheck-path"           = "/"
       "alb.ingress.kubernetes.io/certificate-arn"            = var.acm_certificate_arn
       "alb.ingress.kubernetes.io/ssl-policy"                 = "ELBSecurityPolicy-TLS13-1-2-2021-06"
       "alb.ingress.kubernetes.io/listen-ports"               = jsonencode([
