@@ -1,5 +1,5 @@
 resource "aws_route53_record" "tenant_alb_record" {
-  zone_id = data.aws_route53_zone.primary.zone_id
+  zone_id = var.route53_zone_id
   name    = "${var.tenant_name}.${var.domain_name}"  # e.g., tenant1.example.com
   type    = "A"
 
